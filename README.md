@@ -1,16 +1,17 @@
 # Grocery Store
 
-Let's simulate a grocery store system! We want to be able to keep track of the orders that folks make, both online and physically in our grocery store.
+Let's simulate a grocery store system! We want to be able to keep track of the orders that folks make.
 
 This project will allow you to explore object-oriented design as well as a few other new topics. This is an individual, [stage 1](https://github.com/Ada-Developers-Academy/pedagogy/blob/master/rule-of-three.md) project.
 
 ## Learning Goals
-You should demonstrate an ability to:
-- Practice Test-Driven-Development
-- Use instance variables and methods
-- Reading from a CSV file
-- Write DRY code by reusing methods
-- Use inheritance to create a subclass
+
+Skills that should be demonstrated through this project:
+
+- Test-Driven-Development
+- Using instance variables and methods
+- Object composition
+- Reading data from a CSV file
 
 ## Baseline Setup
 
@@ -19,12 +20,12 @@ You should demonstrate an ability to:
 1. `cd` into the dir created `$ cd grocery-store`
 1. Run `git remote -v` to verify the folder you are in corresponds to the fork you have created.  
   If it is **correct** it will include your username
-  If it is **incorrect** it will include "AdaGold" or "Ada-C8" 
+  If it is **incorrect** it will include "AdaGold" or "Ada-C#"
 1. Run `gem install minitest-skip` to install an extra gem for testing (more on what this actually does later).
 
 ### Testing
 
-This is our first project with real tests! Following the instructions from the [TDD lecture](https://github.com/Ada-Developers-Academy/textbook-curriculum/blob/master/00-programming-fundamentals/intro-to-automated-tests.md), there are three things in our project directory:
+This is the first project where you'll be writing your own tests. Following the instructions from the [TDD lecture](https://github.com/Ada-Developers-Academy/textbook-curriculum/blob/master/00-programming-fundamentals/intro-to-automated-tests.md), there are three things in our project directory:
 
 ```
 Rakefile
@@ -32,15 +33,15 @@ lib/
 specs/
 ```
 
-Each class you write (there will only be one until wave 3) should get its own file, `lib/class_name.rb`. The specs for that class will be in `specs/class_name_spec.rb`, and you can run all specs using the `rake` command from your terminal.
-
+Each class you write should get its own file, `lib/class_name.rb`. The specs for that class will be in `specs/class_name_spec.rb`, and you can run all specs using the `rake` command from your terminal.
 
 ## Wave 1
 
 ### Learning Goals
-- Create a **class** inside of a **module**
-- Create **methods** inside the **class** to perform actions
-- Learn how Ruby does error handling
+- Create a **class**
+- Write **instance methods** inside a **class** to perform actions
+- Link two classes using **composition**
+- Use exceptions to handle errors
 - Verify code correctness by **testing**
 
 ### Testing
@@ -48,135 +49,112 @@ For Wave 1, all tests have been provided for you. For each piece of functionalit
 
 ### Requirements
 
-Create a `Grocery` module which will contain an `Order` class and any future grocery store logic.
+#### Customer
+
+Create a class called `Customer`. Each new Customer should include the following attributes:
+- ID, a number
+- Email address, a string
+- Delivery address, a hash
+
+ID should be _readable_ but not _writable_; the other two attributes can be both read and written.
+
+#### Order
 
 Create an `Order` class which should have the following functionality:
 - A new order should be created with:
-  - an ID, read-only
-  - a collection of products and their cost
-    - zero products is permitted
-    - you can assume that there is **only one** of each product
+  - ID, a number (read-only)
+  - A collection of products and their cost
+    - Zero products is permitted
+    - You can assume that there is **only one** of each product
+  - An instance of `Customer`, the person who placed this order
+  - A `fulfillment_status`, a symbol, one of `:pending`, `:paid`, `:processing`, `:shipped`, or `:complete`
+    - If no `fulfillment_status` is provided, it will default to `:pending`
+    - If a status is given that is not one of the above, an `ArgumentError` should be raised
 - A `total` method which will calculate the total cost of the order by:
-  - summing up the products
-  - adding a 7.5% tax
-  - ensure the result is rounded to two decimal places
+  - Summing up the products
+  - Adding a 7.5% tax
+  - Rounding the result to two decimal places
 - An `add_product` method which will take in two parameters, product name and price, and add the data to the product collection
-  - It should return `true` if the item was successfully added and `false` if it was not
-
+  - If a product with the same name has already been added to the order, an `ArgumentError` should be raised
 
 ### Optional:
 Make sure to write tests for any optionals you implement!
 
 - Add a `remove_product` method to the `Order` class which will take in one parameter, a product name, and remove the product from the collection
-    - It should return `true` if the item was successfully remove and `false` if it was not
+  - If no product with that name was found, an `ArgumentError` should be raised
 
 ## Wave 2
 
 ### Learning Goals
 - Create and use class methods
 - Use a CSV file for loading data
-- Create your own tests to verify method correctness.
+- Create your own tests to verify method correctness
 
 ### Testing
 You enter Wave 2 with all tests from Wave 1 passing. In Wave 2, you will fill in the test stubs that have already been provided for you in the `order_spec.rb` file and add the code which will get these tests to pass. You should run the tests regularly alongside the code you are writing in the `Order` class itself.
 
-### Requirements
-- Update the `Order` class to be able to handle all of the fields from the CSV file used as input
-  - To try it out, manually choose the data from the first line of the CSV file and ensure you can create a new instance of your `Order` using that data
-- Add the following **class** methods to your existing `Order` class
-  - `self.all` - returns a collection of `Order` instances, representing all of the Orders described in the CSV. See below for the CSV file specifications
-    - Determine if the data structure you used in Wave 1 will still work for these new requirements
-    - Note that to parse the product string from the CSV file you will need to use the `split` method
-  - `self.find(id)` - returns an instance of `Order` where the value of the id field in the CSV matches the passed parameter.
-
-
-#### Error Handling
-- What should your program do if `Order.find` is called with an ID that doesn't exist?
-
-#### CSV Data File
-
-The data, in order in the CSV, consists of:  
-
-| Field    | Type     | Description
-|----------|----------|------------
-| ID       | Integer  | A unique identifier for that Order
-| Products  | String  | The list of products in the following format: `name:price;nextname:nextprice`
-
-
-## Wave 3
-### Learning Goals
-- Use inheritance to share some behavior across classes
-- Enhance functionality built in Wave 1
-- Add tests for all new classes and inherited functionality
-
-### Testing
-You enter Wave 3 with all of your `Order` tests passing from Waves 1 & 2. In Wave 3 you will take the test stubs that are already written for you and fill in the test code that will get the tests to pass. You will continue running these test alongside the code you write to ensure you are going in the right direction.
+**When you are done with Wave 2, all your tests from Wave 1 should still pass!**
 
 ### Requirements
-
-For wave 3, you will create two new classes: `Customer` and `OnlineOrder`.
-
- The `OnlineOrder` class will inherit behavior from the `Order` class and include additional data to track the customer and order status. An **instance** of the `Customer` class will be used _within_ each **instance** of the `OnlineOrder` class.
-
-Each class should get its own file under the `lib/` directory, and each already has a spec file with stub tests.
 
 #### Customer
-Create a `Customer` class within the `Grocery` module.
 
-Each new Customer should include the following attributes:
-- ID
-- email address
-- delivery address information
+Add the following **class methods** to the `Customer` class:
+- `self.all` - returns a collection of `Customer` instances, representing all of the Customer described in the CSV file
+- `self.find(id)` - returns an instance of `Customer` where the value of the id field in the CSV matches the passed parameter
 
-- The Customer should also have the following **class** methods:
-  - `self.all` - returns a collection of `Customer` instances, representing all of the Customer described in the CSV. See below for the CSV file specifications
-  - `self.find(id)` - returns an instance of `Customer` where the value of the id field in the CSV matches the passed parameter.
+`Customer.find` should not parse the CSV file itself. Instead it should invoke `Customer.all` and search through the results for a customer with a matching ID.
 
+##### Customer CSV File
 
-#### CSV Data File
-The data for the customer CSV file consists of:
+Customer data lives in the file `data/customers.csv`. The data in this file has the following columns:
 
-| Field          | Type    | Description
-|----------------|---------|------------
-| Customer ID | Integer | A unique identifier corresponding to the Customer
-| Email   | String | The customer's e-mail address
-| Address 1 | String | The customer's street address
-| City |  String | The customer's city
-| State | String | The customer's state
-| Zip Code | String | The customer's zip code
+Field       | Type    | Description
+---         | ---     | ---
+Customer ID | Integer | A unique identifier corresponding to the Customer
+Email       | String  | The customer's e-mail address
+Address 1   | String  | The customer's street address
+City        | String  | The customer's city
+State       | String  | The customer's state
+Zip Code    | String  | The customer's zip code
 
+**Note:** The columns in the CSV file don't quite match the parameters for the constructor. You'll need to do some work
 
-#### OnlineOrder
-Create an `OnlineOrder` class which will inherit behavior from the `Order` class.
+##### Error Handling
 
-Each new OnlineOrder should include all attributes from the `Order` class as well as the following **additional** attributes:
-- A customer object
-- A fulfillment status (stored as a **Symbol**)
-  - pending, paid, processing, shipped or complete
-  - If no status is provided, it should set to pending as the default
+What should your program do if `Customer.find` is called with an ID that doesn't exist? Hint: what does [the `find` method for a Ruby array](https://ruby-doc.org/core/Enumerable.html#method-i-find) do?
 
-The OnlineOrder should include the following updated functionality:
-- The `total` method should be the same, except it will add a $10 shipping fee
-- The `add_product` method should be updated to permit a new product to be added **ONLY** if the status is either pending or paid (no other statuses permitted)
-  - Otherwise, it should raise an `ArgumentError` (Google this!)
+#### Order
 
-The OnlineOrder should also have the following **class** methods:
-  - `self.all` - returns a collection of `OnlineOrder` instances, representing all of the OnlineOrders described in the CSV. See below for the CSV file specifications
-    - **Question** Ask yourself, what is different about this `all` method versus the `Order.all` method? What is the same?
-  - `self.find(id)` - returns an instance of `OnlineOrder` where the value of the id field in the CSV matches the passed parameter.
-    -**Question** Ask yourself, what is different about this `find` method versus the `Order.find` method?
-  - `self.find_by_customer(customer_id)` - returns a **list** of `OnlineOrder` instances where the value of the customer's ID matches the passed parameter.
+Add the following **class methods** to the `Order` class:
+- `self.all` - returns a collection of `Order` instances, representing all of the Orders described in the CSV file
+- `self.find(id)` - returns an instance of `Order` where the value of the id field in the CSV matches the passed parameter
 
+As before, `Order.find` should call `Order.all` instead of loading the CSV file itself.
 
-#### CSV Data File
-The data for the online order CSV file consists of:
+##### Order CSV File
 
-| Field          | Type    | Description
-|----------------|---------|------------
-| ID | Integer | A unique identifier for that Online Order
-| Products  | String  | The list of products in the following format: `name:price;nextname:nextprice`
-| Customer ID | Integer | A unique identifier corresponding to a Customer
-| Status | String | A string representing the order's current status
+Order data lives in the file `data/orders.csv`. The data in this file has the following columns:
+
+Field       | Type    | Description
+------------|---------|------------
+ID          | Integer | A unique identifier for that Online Order
+Products    | String  | The list of products in the following format: `name:price;nextname:nextprice`
+Customer ID | Integer | A unique identifier corresponding to a Customer
+Status      | String  | A string representing the order's current status
+
+The data in this file is very different than what `Order.new` takes. You will have two big pieces of work here:
+
+1. Parse the list of products into a hash
+    - This would be a great piece of logic to put into a helper method
+    - You might want to look into Ruby's `split` method
+    - We recommend manually copying the first product string from the CSV file and using pry to prototype this logic
+1. Turn the customer ID into an instance of `Customer`
+    - Didn't you just write a method to do this?
+
+### Optional:
+
+- `Order.find_by_customer(customer_id)` - returns a **list** of `Order` instances where the value of the customer's ID matches the passed parameter.
 
 ## What We Are Looking For
 Check out the [feedback template](feedback.md) to see what instructors will be looking for.
