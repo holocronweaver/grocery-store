@@ -66,8 +66,7 @@ describe "Order Wave 1" do
       products = { "banana" => 1.99, "cracker" => 3.00 }
       order = Order.new(1337, products, customer)
 
-      sum = products.values.inject(0, :+)
-      expected_total = sum + (sum * 0.075).round(2)
+      expected_total = 5.36
 
       expect(order.total).must_equal expected_total
     end
@@ -115,14 +114,30 @@ describe "Order Wave 1" do
 end
 
 # TODO: change 'xdescribe' to 'describe' to run these tests
-xdescribe "Order Wave 2" do
+describe "Order Wave 2" do
   describe "Order.all" do
     it "Returns an array of all orders" do
       # TODO: Your test code here!
     end
 
     it "Returns accurate information about the first order" do
-      # TODO: Your test code here!
+      id = 1
+      products = {
+        "Lobster" => 17.18,
+        "Annatto seed" => 58.38,
+        "Camomile" => 83.21
+      }
+      customer_id = 25
+      status = :complete
+
+      order = Order.all.first
+
+      # Check that all data was loaded as expected
+      expect(order.id).must_equal id
+      expect(order.products).must_equal products
+      expect(order.customer).must_be_kind_of Customer
+      expect(order.customer.id).must_equal customer_id
+      expect(order.status).must_equal status
     end
 
     it "Returns accurate information about the last order" do
@@ -139,7 +154,7 @@ xdescribe "Order Wave 2" do
       # TODO: Your test code here!
     end
 
-    it "Raises an error for an order that doesn't exist" do
+    it "Returns nil for an order that doesn't exist" do
       # TODO: Your test code here!
     end
   end
