@@ -60,16 +60,20 @@ ID should be _readable_ but not _writable_; the other two attributes can be both
 
 #### Order
 
-Create an `Order` class which should have the following functionality:
-- A new order should be created with:
-  - ID, a number (read-only)
-  - A collection of products and their cost
-    - Zero products is permitted
+Create a class called `Order`. Each new Order should include the following attributes:
+- ID, a number (read-only)
+- A collection of products and their cost. This data will be given as a hash that looks like this:
+    ```ruby
+    { "banana" => 1.99, "cracker" => 3.00 }
+    ```
+    - Zero products is permitted (an empty hash)
     - You can assume that there is **only one** of each product
-  - An instance of `Customer`, the person who placed this order
-  - A `fulfillment_status`, a symbol, one of `:pending`, `:paid`, `:processing`, `:shipped`, or `:complete`
-    - If no `fulfillment_status` is provided, it will default to `:pending`
-    - If a status is given that is not one of the above, an `ArgumentError` should be raised
+- An instance of `Customer`, the person who placed this order
+- A `fulfillment_status`, a symbol, one of `:pending`, `:paid`, `:processing`, `:shipped`, or `:complete`
+  - If no `fulfillment_status` is provided, it will default to `:pending`
+  - If a status is given that is not one of the above, an `ArgumentError` should be raised
+
+In addition, `Order` should have:
 - A `total` method which will calculate the total cost of the order by:
   - Summing up the products
   - Adding a 7.5% tax
