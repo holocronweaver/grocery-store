@@ -95,7 +95,7 @@ Make sure to write tests for any optionals you implement!
 - Create your own tests to verify method correctness
 
 ### Testing
-You enter Wave 2 with all tests from Wave 1 passing. In Wave 2, you will fill in the test stubs that have already been provided for you in the `order_spec.rb` file and add the code which will get these tests to pass. You should run the tests regularly alongside the code you are writing in the `Order` class itself.
+You enter Wave 2 with all tests from Wave 1 passing. In Wave 2, all the tests for `Customer` and one of the specs for `Order` have been provided. The remaining tests are stubbed out in `order_spec.rb`. Filling in these stubs is part of Wave 2.
 
 **When you are done with Wave 2, all your tests from Wave 1 should still pass!**
 
