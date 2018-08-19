@@ -19,10 +19,10 @@ describe "Order Wave 1" do
   end
 
   describe "#initialize" do
-    it "Takes an ID, collection of products, customer, and status" do
+    it "Takes an ID, collection of products, customer, and fulfillment_status" do
       id = 1337
-      status = :shipped
-      order = Order.new(id, {}, customer, status)
+      fulfillment_status = :shipped
+      order = Order.new(id, {}, customer, fulfillment_status)
 
       expect(order).must_respond_to :id
       expect(order.id).must_equal id
@@ -33,29 +33,29 @@ describe "Order Wave 1" do
       expect(order).must_respond_to :customer
       expect(order.customer).must_equal customer
 
-      expect(order).must_respond_to :status
-      expect(order.status).must_equal status
+      expect(order).must_respond_to :fulfillment_status
+      expect(order.fulfillment_status).must_equal fulfillment_status
     end
 
     it "Accepts all legal statuses" do
       valid_statuses = %i[pending paid processing shipped complete]
 
-      valid_statuses.each do |status|
-        order = Order.new(1, {}, customer, status)
-        expect(order.status).must_equal status
+      valid_statuses.each do |fulfillment_status|
+        order = Order.new(1, {}, customer, fulfillment_status)
+        expect(order.fulfillment_status).must_equal fulfillment_status
       end
     end
 
-    it "Uses pending if no status is supplied" do
+    it "Uses pending if no fulfillment_status is supplied" do
       order = Order.new(1, {}, customer)
-      expect(order.status).must_equal :pending
+      expect(order.fulfillment_status).must_equal :pending
     end
 
     it "Raises an ArgumentError for bogus statuses" do
       bogus_statuses = [3, :bogus, 'pending', nil]
-      bogus_statuses.each do |status|
+      bogus_statuses.each do |fulfillment_status|
         expect {
-          Order.new(1, {}, customer, status)
+          Order.new(1, {}, customer, fulfillment_status)
         }.must_raise ArgumentError
       end
     end
@@ -128,7 +128,7 @@ describe "Order Wave 2" do
         "Camomile" => 83.21
       }
       customer_id = 25
-      status = :complete
+      fulfillment_status = :complete
 
       order = Order.all.first
 
@@ -137,7 +137,7 @@ describe "Order Wave 2" do
       expect(order.products).must_equal products
       expect(order.customer).must_be_kind_of Customer
       expect(order.customer.id).must_equal customer_id
-      expect(order.status).must_equal status
+      expect(order.fulfillment_status).must_equal fulfillment_status
     end
 
     it "Returns accurate information about the last order" do
