@@ -1,36 +1,78 @@
 require 'minitest/autorun'
 require 'minitest/reporters'
 require 'minitest/skip_dsl'
+
+require_relative '../lib/customer'
 require_relative '../lib/order'
 
+Minitest::Reporters.use! Minitest::Reporters::SpecReporter.new
+
 describe "Order Wave 1" do
+  let(:customer) do
+    address = {
+      street: "123 Main",
+      city: "Seattle",
+      state: "WA",
+      zip: "98101"
+    }
+    Customer.new(123, "a@a.co", address)
+  end
+
   describe "#initialize" do
-    it "Takes an ID and collection of products" do
+    it "Takes an ID, collection of products, customer, and fulfillment_status" do
       id = 1337
-      order = Grocery::Order.new(id, {})
+      fulfillment_status = :shipped
+      order = Order.new(id, {}, customer, fulfillment_status)
 
       expect(order).must_respond_to :id
       expect(order.id).must_equal id
-      expect(order.id).must_be_kind_of Integer
 
       expect(order).must_respond_to :products
       expect(order.products.length).must_equal 0
+
+      expect(order).must_respond_to :customer
+      expect(order.customer).must_equal customer
+
+      expect(order).must_respond_to :fulfillment_status
+      expect(order.fulfillment_status).must_equal fulfillment_status
+    end
+
+    it "Accepts all legal statuses" do
+      valid_statuses = %i[pending paid processing shipped complete]
+
+      valid_statuses.each do |fulfillment_status|
+        order = Order.new(1, {}, customer, fulfillment_status)
+        expect(order.fulfillment_status).must_equal fulfillment_status
+      end
+    end
+
+    it "Uses pending if no fulfillment_status is supplied" do
+      order = Order.new(1, {}, customer)
+      expect(order.fulfillment_status).must_equal :pending
+    end
+
+    it "Raises an ArgumentError for bogus statuses" do
+      bogus_statuses = [3, :bogus, 'pending', nil]
+      bogus_statuses.each do |fulfillment_status|
+        expect {
+          Order.new(1, {}, customer, fulfillment_status)
+        }.must_raise ArgumentError
+      end
     end
   end
 
   describe "#total" do
     it "Returns the total from the collection of products" do
       products = { "banana" => 1.99, "cracker" => 3.00 }
-      order = Grocery::Order.new(1337, products)
+      order = Order.new(1337, products, customer)
 
-      sum = products.values.inject(0, :+)
-      expected_total = sum + (sum * 0.075).round(2)
+      expected_total = 5.36
 
       expect(order.total).must_equal expected_total
     end
 
     it "Returns a total of zero if there are no products" do
-      order = Grocery::Order.new(1337, {})
+      order = Order.new(1337, {}, customer)
 
       expect(order.total).must_equal 0
     end
@@ -40,7 +82,7 @@ describe "Order Wave 1" do
     it "Increases the number of products" do
       products = { "banana" => 1.99, "cracker" => 3.00 }
       before_count = products.count
-      order = Grocery::Order.new(1337, products)
+      order = Order.new(1337, products, customer)
 
       order.add_product("salad", 4.25)
       expected_count = before_count + 1
@@ -49,44 +91,53 @@ describe "Order Wave 1" do
 
     it "Is added to the collection of products" do
       products = { "banana" => 1.99, "cracker" => 3.00 }
-      order = Grocery::Order.new(1337, products)
+      order = Order.new(1337, products, customer)
 
       order.add_product("sandwich", 4.25)
       expect(order.products.include?("sandwich")).must_equal true
     end
 
-    it "Returns false if the product is already present" do
+    it "Raises an ArgumentError if the product is already present" do
       products = { "banana" => 1.99, "cracker" => 3.00 }
 
-      order = Grocery::Order.new(1337, products)
+      order = Order.new(1337, products, customer)
       before_total = order.total
 
-      result = order.add_product("banana", 4.25)
-      after_total = order.total
+      expect {
+        order.add_product("banana", 4.25)
+      }.must_raise ArgumentError
 
-      expect(result).must_equal false
-      expect(before_total).must_equal after_total
-    end
-
-    it "Returns true if the product is new" do
-      products = { "banana" => 1.99, "cracker" => 3.00 }
-      order = Grocery::Order.new(1337, products)
-
-      result = order.add_product("salad", 4.25)
-      expect(result).must_equal true
+      # The list of products should not have been modified
+      expect(order.total).must_equal before_total
     end
   end
 end
 
 # TODO: change 'xdescribe' to 'describe' to run these tests
-xdescribe "Order Wave 2" do
+describe "Order Wave 2" do
   describe "Order.all" do
     it "Returns an array of all orders" do
       # TODO: Your test code here!
     end
 
     it "Returns accurate information about the first order" do
-      # TODO: Your test code here!
+      id = 1
+      products = {
+        "Lobster" => 17.18,
+        "Annatto seed" => 58.38,
+        "Camomile" => 83.21
+      }
+      customer_id = 25
+      fulfillment_status = :complete
+
+      order = Order.all.first
+
+      # Check that all data was loaded as expected
+      expect(order.id).must_equal id
+      expect(order.products).must_equal products
+      expect(order.customer).must_be_kind_of Customer
+      expect(order.customer.id).must_equal customer_id
+      expect(order.fulfillment_status).must_equal fulfillment_status
     end
 
     it "Returns accurate information about the last order" do
@@ -103,7 +154,7 @@ xdescribe "Order Wave 2" do
       # TODO: Your test code here!
     end
 
-    it "Raises an error for an order that doesn't exist" do
+    it "Returns nil for an order that doesn't exist" do
       # TODO: Your test code here!
     end
   end
