@@ -160,5 +160,23 @@ The data in this file is very different than what `Order.new` takes. You will ha
 
 - `Order.find_by_customer(customer_id)` - returns a **list** of `Order` instances where the value of the customer's ID matches the passed parameter.
 
+## Optional Wave 3: Saving Order Data
+
+Add a new class method to each of `Order` and `Customer` called `save`. The `save` method should take one parameter, a file name, and save the list of objects to that file in the same format as the original CSV file.
+
+When you're done, you should be able to write code like the following:
+
+```
+$ pry -r ./lib/customer.rb
+pry> Customer.save('new_customer_list.csv')
+pry> exit
+$ cat new_customer_list.csv
+1,leonard.rogahn@hagenes.org,71596 Eden Route,Connellymouth,LA,98872-9105
+2,ruben_nikolaus@kreiger.com,876 Kemmer Cove,East Luellatown,AL,21362
+[ ... ]
+```
+
+Write tests for these method. What interesting cases might exist?
+
 ## What We Are Looking For
 Check out the [feedback template](feedback.md) to see what instructors will be looking for.
