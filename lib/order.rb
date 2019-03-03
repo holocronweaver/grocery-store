@@ -1,3 +1,6 @@
+require 'csv'
+require_relative 'customer'
+
 class Order
   attr_reader :id, :products, :customer, :fulfillment_status
 
@@ -26,9 +29,30 @@ class Order
   end
 
   def add_product(product_name, price)
-    #TODO: Raise ArgumentError if product name already in products list.
+    if @products.key? product_name
+      raise ArgumentError, "That product name is already present"
+    end
 
-    #TODO: Add the data to products.
+    @products[product_name] = price
+  end
+
+  def self.all
+    # TODO: returns a collection of `Order` instances, representing all of
+    # the Orders described in the CSV file
+    orders = []
+    headers = ['id', 'products', 'customer id', 'status']
+
+    CSV.foreach("data/orders.csv", :headers => headers).each do |row|
+      #TODO: Convert each row to an Order object and add to orders.
+    end
+    return orders
+  end
+
+  def self.find(id)
+    # returns an instance of `Order` where the value of the id field
+    # in the CSV matches the passed parameter
+
+    #TODO: Use `all.find` - the power of enumerables!
   end
 
 end
