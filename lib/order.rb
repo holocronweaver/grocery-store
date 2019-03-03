@@ -1,3 +1,6 @@
+require 'csv'
+require_relative 'customer'
+
 class Order
   attr_reader :id, :products, :customer, :fulfillment_status
 
@@ -32,6 +35,36 @@ class Order
     end
 
     @products[product_name] = price
+  end
+
+  def self.all
+    # returns a collection of `Order` instances, representing all of
+    # the Orders described in the CSV file
+    orders = []
+    headers = ['id', 'products', 'customer id', 'status']
+
+    CSV.foreach("data/orders.csv", :headers => headers).each do |row|
+      products = row['products'].split(';').map { |product|
+        keyvalue = product.split(':')
+        [keyvalue[0], keyvalue[1].to_f]
+      }.to_h
+
+      customer = Customer.find(row['customer id'].to_i)
+
+      orders << Order.new(
+        row['id'].to_i,
+        products,
+        customer,
+        row['status'].to_sym
+      )
+    end
+    return orders
+  end
+
+  def self.find(id)
+    # returns an instance of `Order` where the value of the id field
+    # in the CSV matches the passed parameter
+    self.all.find{ |order| order.id == id }
   end
 
 end
